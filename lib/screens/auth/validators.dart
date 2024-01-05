@@ -24,9 +24,9 @@ class Validators {
     if (value == null || value.isEmpty) {
       return "Password is required";
     }
-    if (!RegExp(_passwordRedX).hasMatch(value)) {
-      return "Password must be at least 8 characters long and include both letters and numbers";
-    }
+    // if (!RegExp(_passwordRedX).hasMatch(value)) {
+    //   return "Password must be at least 8 characters long and include both letters and numbers";
+    // }
     return null;
   }
 

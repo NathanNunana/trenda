@@ -1,16 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:trenda/providers/_index.dart';
 import 'package:trenda/screens/auth/validators.dart';
 import 'package:trenda/utils/_index.dart';
 import 'package:trenda/widgets/_index.dart';
 
-class SignIn extends StatefulWidget {
+class SignIn extends ConsumerStatefulWidget {
   const SignIn({super.key});
 
   @override
-  State<SignIn> createState() => _SignInState();
+  ConsumerState<SignIn> createState() => _SignInState();
 }
 
-class _SignInState extends State<SignIn> {
+class _SignInState extends ConsumerState<SignIn> {
   late final TextEditingController _emailCtrl;
   late final TextEditingController _passwordCtrl;
   late final TextEditingController _usernameCtrl;
@@ -39,6 +41,33 @@ class _SignInState extends State<SignIn> {
       height: size,
     );
   }
+
+  Future login({email, password}) async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      final resp = await ref.read(authProvider).login(
+            email: email.trim(),
+            password: password.trim(),
+          );
+
+      print(resp.status == Status.successful);
+
+      if (resp.status == Status.successful) gotoHome();
+    } catch (err) {
+      print(err);
+      setState(() {
+        isLoading = false;
+      });
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  gotoHome() => Navigator.pushNamed(context, AppRoutes.homeRoute);
 
   final _formKey = GlobalKey<FormState>();
   bool isLoading = false;
@@ -133,11 +162,12 @@ class _SignInState extends State<SignIn> {
                       isLoading: isLoading,
                       onPressed: () {
                         if (_formKey.currentState!.validate()) {
-                          setState(() {
-                            isLoading = true;
-                          });
+                          login(
+                            email: _emailCtrl.text,
+                            password: _passwordCtrl.text,
+                          );
+                          Navigator.pushNamed(context, AppRoutes.homeRoute);
                         }
-                        Navigator.pushNamed(context, AppRoutes.homeRoute);
                       },
                     ),
                   ),
